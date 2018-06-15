@@ -1,20 +1,33 @@
 <template>
   <Page class="page">
-    <ActionBar class="action-bar" title="Home"/>
+    <ActionBar class="action-bar" title="Latest Articles"/>
 
-    <StackLayout>
-      <Label text="Latest articles" class="action-bar" />
-      <!--<Button class="btn btn-primary" @tap="$router.push('/counter')">counter</Button>-->
-      <!--<Button class="btn btn-primary" @tap="load()">{{test}}</Button>-->
-
+    <WrapLayout>
+      <ScrollView orientation="horizontal">
+      <SegmentedBar  selectedIndex="0"  @selectedIndexChange="onSelectedIndexChange">
+        <SegmentedBarItem title="All" />
+        <SegmentedBarItem title="My Space" />
+        <SegmentedBarItem title="Alumni" />
+        <SegmentedBarItem title="Technology" />
+        <SegmentedBarItem title="Tamil" />
+        <SegmentedBarItem title="Opportunities" />
+        <SegmentedBarItem title="News and Views" />
+        <SegmentedBarItem title="Reviews" />
+        <SegmentedBarItem title="Events" />
+        <SegmentedBarItem title="Sports" />
+      </SegmentedBar>
+      </ScrollView>
       <ListView for="item in data" @itemTap="loadarticle">
         <v-template>
           <!-- Shows the list item label in the default color and stye. -->
           <Label :text="item.title"  class="title"/>
         </v-template>
       </ListView>
+      <Button text="Previous" @tap="previous" class="button1"/>
 
-    </StackLayout>
+      <Button text="Next" @tap="onButtonTap" class="button2"/>
+
+    </WrapLayout>
   </Page>
 </template>
 
@@ -23,8 +36,12 @@
     export default {
         data () {
             return {
-                data:['a','b'],
-                test:""
+                data:[],
+                test:"",
+                page:1,
+                categories:[],
+                selectedItem:"All",
+
             };
         },
         created(){
@@ -32,6 +49,14 @@
                 .then((response) => {
                     this.test="success";
                     this.data = response.data.data;
+                }).catch((err)=>{
+                console.log(err)
+            });
+
+            this.axios.get('https://api.guindytimes.com/allcategories')
+                .then((response) => {
+                    this.test="success";
+                    this.categories = response.data.data;
                 }).catch((err)=>{
                 console.log(err)
             })
@@ -45,19 +70,55 @@
                         }
                     }
                 });
+            },
+            onButtonTap(){
+                this.page += 1;
+                this.axios.get('https://api.guindytimes.com/allarticles?page='+this.page)
+                    .then((response) => {
+                        this.test="success";
+                        this.data = response.data.data ;
+                    }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            previous(){
+                this.page -= 1;
+                this.axios.get('https://api.guindytimes.com/allarticles?page='+this.page)
+                    .then((response) => {
+                        this.test="success";
+                        this.data = response.data.data ;
+                    }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            onSelectedIndexChange(event){
+                this.page = 1;
+                console.log(event.SegmentedBarItem)
+                this.axios.get('https://api.guindytimes.com/articles?category='+this.selectedItem+'&page='+this.page)
+                    .then((response) => {
+                        this.test="success";
+                        this.data = response.data.data ;
+                    }).catch((err)=>{
+                    console.log(err)
+                })
             }
-        }
+            }
     };
 </script>
 
 <style>
-  .grid{
-    margin-left: 20%;
-  }
   .title{
     font-size: 30px;
-    overflow: hidden;
-    word-wrap: break-word;
-    object-fit: fill;
+
+  }
+  .button1{
+    align-self: left;
+    margin-left: 20px;
+    margin-right: 500px;
+  }
+  .button2{
+    align-self: right;
+    margin-right: 5px;
+    padding: 10%;
   }
 </style>
