@@ -33,11 +33,11 @@ const router = new VueRouter({
       },
     },
       {
-        name:"singlearticle",
-    path:'/singlearticle',
+          name:"singlearticle",
+          path:'/singlearticle',
           component: SingleArticle,
           meta:{
-              title: 'Enjoy!'
+              title: 'Single Article'
           }
       },
     {path: '*', redirect: '/home'},
